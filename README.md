@@ -30,7 +30,7 @@ And after thinking about all of the above. I decided I must find some cross plat
 
 ## The possibilities
 
-Since there are a lot of options for a CI solution out there (see this), I had to find a few iron-cloud criteria which will help me to focus on a few. And I have decided on these:
+Since there are a lot of options for a CI solution out there ([see this](https://github.com/ligurio/awesome-ci)), I had to find a few iron-cloud criteria which will help me to focus on a few. And I have decided on these:
 
 *	Ability to run tasks locally - critical to being cross platform
 *	Top (giant) player - Github, Gitlab, etc. Ignoring even a 4k stared repo. I just can't let myself find out in a few years my choice was abundant.
@@ -50,9 +50,9 @@ Between my two finalists, I dabbled in gitlab but then really wanted to try Jenk
 
 ## Trying out Jenkins
 
-Testing period was May 5, 2023 until May 22, 2023 (under this project). Unfortunately, I abandoned it. And here I will explain why.
+Testing period was May 5, 2023 until May 22, 2023 ([under this project](https://github.com/yonixw/LivestreamDockerRecorder)). Unfortunately, I abandoned it. And here I will explain why.
 
-It started very good. There is an offical docker image and a project allowing you to run a "Jenkinsfile". And it supports they entire "Declarative Pipeline" so you can pass variables between stages just like in a real jenkins server etc.
+It started very good. There is an [offical docker image and a project](https://github.com/jenkinsci/jenkinsfile-runner) allowing you to run a "Jenkinsfile". And it supports they entire "Declarative Pipeline" so you can pass variables between stages just like in a real jenkins server etc.
 
 Learning Jenkins was surely not straight-forwarded but I guessed it all was worth it once I migrated to it. I even made a custom bash script to store my learning phase as a common function inside it (pull, run, lint etc.). And as I dig deeper, I found a lot of undocumented stuff, but again, thought it was worth the "long way". Here are more examples of unique issues I came across:
 
@@ -66,24 +66,35 @@ Learning Jenkins was surely not straight-forwarded but I guessed it all was wort
 
 
 You might think that this list is absurd to handle on top of the official docker as it might be out-dated in their next release, but for me it looked easy to do with a (200 LOC) custom script and a little of bash stuff even if it sure made me worry about the solution I chose. But then came a problem that was just not possible to solve.
-You see, Jenkins is a software from 2011, which is the very very start of the CICD movement (Before docker in 2013 and Github actions in 2018). Which means its set of assumptions is also very old. It starts with the fact that docker delegation is not even a built-in feature, but a plugin. And it ends, unfortunately with the bad assumption of how it produces, integrate and collects logs.
-As I understand it, each agent/worker send the console log of its process back to the master node. This step alone is not consistent, as logs of "starting a parallel job" that comes from jenkins are not stored in the same place with the process log (console text). And then you have 2 options:
-1] Get the dump of all the logs that the Jenkins master collected, i.e., "Console Text". which is good for simple linear cases but become unreadable fast in other situation (see here how it looks after the user help) mainly because all context is lost, and even a simple row cannot restore its stage name!
-2] Get a structured log, which is more "Jenkinsfile language nodes" oriented, i.e. you can see the console text of an action. But stage in a stage planning? No logs, as the system logs and context of the parse process can only seen in the log dump (i.e. the full console text from option 1]) from my experience. Here is examples how jenkins log structure works i.e. action nodes
-You can see those problems of log inconsistency here: https://i.imgur.com/bsUmt8x.png
-And this time, I had reached a wall. Why? Because in every other CICD both the system logs and logs of steps are collected at the stage level out of the box. Here I will either give this feature up or will have to write a low-level plugin to handle it. (if even possible, see the inconsistencies in existing plugins in my image example above).
-But why not just take the console text that IS separated? Again, because to me, it's too much to give up. As inner parsing of a CI file can cause problem too. And if I don't see any way to debug it, that it is just a ticking bomb until I will find this bug in the future. Which I really don't want.
-Why so many big companies use it then? Great question! Maybe because the worker pool is already there. And maybe their build flow is more straight-forwarded. But if I find problems and inconsistencies even in my evaluation phase... then it is just too much for me and I will search for alternatives.
 
+You see, Jenkins is a software from 2011, which is the very very start of the CICD movement (Before docker in 2013 and Github actions in 2018). Which means its set of assumptions is also very old. It starts with the fact that docker delegation is not even a built-in feature, but a plugin. And it ends, unfortunately with the bad assumption of how it produces, integrate and collects logs.
+
+As I understand it, each agent/worker send the console log of its process back to the master node. This step alone is not consistent, as logs of "starting a parallel job" that comes from jenkins are not stored in the same place with the process log (console text). And then you have 2 options:
+
+1] Get the dump of all the logs that the Jenkins master collected, i.e., "Console Text". which is good for simple linear cases but become unreadable fast in other situation ([see here how it looks after the user help](https://stackoverflow.com/a/58050883/1997873)) mainly because all context is lost, and even a simple row cannot restore its stage name!
+
+2] Get a structured log, which is more "Jenkinsfile language nodes" oriented, i.e. you can see the console text of an action. But stage in a stage planning? No logs, as the system logs and context of the parse process can only seen in the log dump (i.e. the full console text from option 1]) from my experience. Here is examples how jenkins log structure works i.e. action nodes: [Link](https://i.imgur.com/5A1W998.jpg)
+
+You can see those problems of log inconsistency here: https://i.imgur.com/bsUmt8x.png
+
+And this time, I had reached a wall. Why? Because in every other CICD both the system logs and logs of steps are collected at the stage level out of the box. Here I will either give this feature up or will have to write a low-level plugin to handle it. (if even possible, see the inconsistencies in existing plugins in my image example above).
+
+But why not just take the console text that IS separated? Again, because to me, it's too much to give up. As inner parsing of a CI file can cause problem too. And if I don't see any way to debug it, that it is just a ticking bomb until I will find this bug in the future. Which I really don't want.
+
+Why so many big companies use it then? Great question! Maybe because the worker pool is already there. And maybe their build flow is more straight-forwarded. But if I find problems and inconsistencies even in my evaluation phase... then it is just too much for me and I will search for alternatives.
 
 ## Moving to gitlab runner
 
 Gitlab runner docker is also an officially supported solution to run gitlab CI file. There are some caveats. You can only run 1 stage at a time (since the runner will do the same under a gitlab instance) but a simple linear foreach in a bash script can fix this. which will give us a very similar feeling to the real solution.
 What is mostly missing:
-•	There are no loops and dynamic stages, which is the real downgrade in my opinion. But seeing it as the only option I don't have much to do about it.
-•	You can't build a docker in one step and use it in another unless you push it to a registry. (For local running, I think tagging it will be enough)
+
+*	There are no loops and dynamic stages, which is the real downgrade in my opinion. But seeing it as the only option I don't have much to do about it.
+*	You can't build a docker in one step and use it in another unless you push it to a registry. (For local running, I think tagging it will be enough)
+
 On the plus side, whenever I go, It will easy to split the stages in such a way the platform except.
+
 There is also no problem with logs (so far) and plugins are just dockers (so we can also use github action plugins).
+
 There is also no need to a huge custom bash script, just a loop on stages and mounting to the correct place, and we are good to go on any platform!
 
 ## Conclusion
