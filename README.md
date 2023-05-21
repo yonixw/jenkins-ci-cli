@@ -84,11 +84,13 @@ place with the process log (console text). And then you have 2 options:
 
 2] Get a structred log, which is more "Jenkinsfile language nodes" oriented, i.e you can see the console text of an action. But stage in a stage plannig? No logs, as the system logs and context of the parse process can only seen in the log dump (i.e the full console text from option 1]) from my experience. [Here is examples how jenkins log structure works i.e. action nodes](https://i.imgur.com/5A1W998.jpg)
 
-And this time, I had reached a wall. Why? Because in every other CICD both the system logs and logs of steps are collected at the stage level out of the box. Here I will either give this feature up or will have to write a low level plugin to handle it. But why
-not just take the console text that IS seperated? Again, because to me, it's too much to give up. As inner parsing of a CI file can cause problem too. And if I don't see any way to debug it, that it is just a ticking bomb until I will it this bug
-in the future. Which I really don't want.
+You can see those problems of log inconssitancy here: https://i.imgur.com/bsUmt8x.png 
 
-Jenkins was just designed to be run on a few runners, not in parallel... I can't see it otherwise given it's log structure.
+And this time, I had reached a wall. Why? Because in every other CICD both the system logs and logs of steps are collected at the stage level out of the box. Here I will either give this feature up or will have to write a low level plugin to handle it. (if even possible, see the inconssitencies in existing plugins in my image example above).
+
+But why not just take the console text that IS seperated? Again, because to me, it's too much to give up. As inner parsing of a CI file can cause problem too. And if I don't see any way to debug it, that it is just a ticking bomb until I will find this bug in the future. Which I really don't want.
+
+Why so many big companies use it then? Great question! Maybe because the worker pool is already there. And maybe their build flow is more straight-forwared. But if I find problems and inconsistencies even in my evaluation phase... then it is just too much for me and I will search for alternatives.
 
 ## Moving to gitlab runner
 
