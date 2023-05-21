@@ -17,7 +17,7 @@ There are a lot of assumptions writing a CI pipeline in a specifiec system:
 * How to share files between steps?
 * What context do you run under? OSes (ubuntu, windows, etc)? Dockers?
 
-There are also a lot of "native" features that you can put in your bash scripts. And are tied to specifiec implementation. For example:
+There are also a lot of "native" features that you cant put in your bash scripts. And are tied to specifiec implementation. For example:
 * How to specify you want 2 stages to run in parallel?
 * How to manually wait for user without spending build times?
 * How to publish HTML reports? (Such as test coverage)
@@ -55,4 +55,41 @@ Between my two finalists, I dabbled in gitlab but then realy wanted to try Jenki
 Which gave me an apataite to make it work. And for the final reason, I understand that a gitlab CI file cannot add steps dinamiclly (like per item in an input list) which is a downgrade compared to Azure Devops and Jenkins.
 
 ## Trying out Jenkins
+
+Testing period was May 5, 2023 until May 22, 2023 ([under this project](https://github.com/yonixw/LivestreamDockerRecorder)). Unfortunately, I abonded it. And here I will explain why.
+
+It started very good. There is an [offical docker image](https://github.com/jenkinsci/jenkinsfile-runner) and a project allowing you to run a "Jenkinsfile". And it support they entire "Decleretive Pipeline" so you can pass variables
+between stages just like in a real jenkins server etc.
+
+Learning Jenkins was surely not straight-forwared but I guessed it all was worth it once I migrated to it. I even made a custom bash script to store my learning phase as a common functions inside it (pull, run, lint etc.).
+And as I digged deeper I found a lot of unducumented stuff, But again, thought it was worth the "long way". Here are more examples of unique issues I came across:
+
+* You had to build a custom docker to have your plugins inside it (not just mount it to the docker)
+* You had to mount your workspace in specifiec scheme to applease some plugins
+* The built in bash did not know how to just add "lint" to the entrypoint, and you had to redifine it
+* You had to know Java conventions of env vars to enable "verbose" mode for plugins. (Since Jenkins is written in Java)
+* I needed to learn how to print the version of each component as it is not a built in feature
+
+You might think that this list is absured to handle on top of the official docker as it might be out-dated in their next realese, but for me it looked easy to do with a custom script and a little of bash scripts even if it sure made me worry about the solution I chose.
+But then came a problem that was just not possible to solve.
+
+You see, Jenkins is a software from 2011, which is the very very start of the CICD movement (Before docker in 2013 and Github actions in 2018). Which means its set of assumptions is also very old. It start with the fact
+that docker delegation is not even a built in feature, but a plugin. And it ends, unfortunately with the bad assumption of how it produces, integrate and collects logs.
+
+As I understand it, each agent/worker send the console log of its process back to the master node. This step alone is not consistent, as logs of "starting a parallel job" that comes from jenkins are not stored in the same
+place with the process log (console text). And then you have 2 options:
+
+1] Get the dump of all the logs that the Jenkins master collected, i.e. "Console Text". which is good for simple linear cases but become unreadable fast in other situation ([see here how it looks after the user help](https://stackoverflow.com/a/58050883/1997873))
+
+2] Get a structred log, which is more "Jenkinsfile language nodes" oriented, i.e you can see the console text of a stage. But stage in a stage? No logs, as the system logs of the file process are not present in the current plugins
+and can only seen in the log dump (i.e the full console text from option 1])
+
+And this time, I had reached a wall. Why? Because in ever other CICD both the system logs and logs of steps are seperated out of the box. Here I will either give this feature up or will have to write a low level plugin to handle it. But why
+not just take the console text that IS seperated? Again, because to me, it's to much to give up. As inner parsing of a CI file can cause problem too. And if I don't see any way to debug it, that it is just a ticking bomb until I will it this bug
+in the future. Which I really don't want.
+
+## Moving to gitlab runner
+
+Gitlab runner is also an officialy supported solution to run gitlab CI file. There are some caveats. You can only run 1 stage at a time (since the runner will do the same under a gitlab instance) but a simpe foreach in a bash script can fix this.
+
 
