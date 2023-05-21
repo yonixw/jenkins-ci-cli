@@ -51,5 +51,8 @@ With the above, I ended up with 2 options: Gitlab and Jenkins. Here is why:
 Please note that Github does have some tools to run a workflow locally, but they are not official and bring me back to my requirement of "Top player". 
 Gitlab is not fully open-sourced but it is open sourced enough for me to get the fully featured CI runner as a docker.
 
-Between my two finalists, I dabbled in gitlab but then realy wanted to try Jenkins as a solution. As, one, it is realy open sourced. and, two, I saw it being used mutliple times in very repectables companies. 
+Between my two finalists, I dabbled in gitlab but then realy wanted to try Jenkins as a solution. As, one, it is really open sourced. and, two, I saw it being used mutliple times in very repectables companies. 
+Which gave me an apataite to make it work. And for the final reason, I understand that a gitlab CI file cannot add steps dinamiclly (like per item in an input list) which is a downgrade compared to Azure Devops and Jenkins.
+
+## Trying out Jenkins
 
