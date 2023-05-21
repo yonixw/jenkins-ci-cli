@@ -70,7 +70,7 @@ And as I digged deeper I found a lot of unducumented stuff, But again, thought i
 * You had to know Java conventions of env vars to enable "verbose" mode for plugins. (Since Jenkins is written in Java)
 * I needed to learn how to print the version of each component as it is not a built in feature
 
-You might think that this list is absured to handle on top of the official docker as it might be out-dated in their next realese, but for me it looked easy to do with a custom script and a little of bash scripts even if it sure made me worry about the solution I chose.
+You might think that this list is absured to handle on top of the official docker as it might be out-dated in their next realese, but for me it looked easy to do with a (200 LOC) custom  script and a little of bash stuff even if it sure made me worry about the solution I chose.
 But then came a problem that was just not possible to solve.
 
 You see, Jenkins is a software from 2011, which is the very very start of the CICD movement (Before docker in 2013 and Github actions in 2018). Which means its set of assumptions is also very old. It start with the fact
@@ -79,17 +79,33 @@ that docker delegation is not even a built in feature, but a plugin. And it ends
 As I understand it, each agent/worker send the console log of its process back to the master node. This step alone is not consistent, as logs of "starting a parallel job" that comes from jenkins are not stored in the same
 place with the process log (console text). And then you have 2 options:
 
-1] Get the dump of all the logs that the Jenkins master collected, i.e. "Console Text". which is good for simple linear cases but become unreadable fast in other situation ([see here how it looks after the user help](https://stackoverflow.com/a/58050883/1997873))
+1] Get the dump of all the logs that the Jenkins master collected, i.e. "Console Text". which is good for simple linear cases but become unreadable fast in other situation ([see here how it looks after the user help](https://stackoverflow.com/a/58050883/1997873)) mainly because all context is lost, and even a simple row cannot restore its stage name!
 
-2] Get a structred log, which is more "Jenkinsfile language nodes" oriented, i.e you can see the console text of a stage. But stage in a stage? No logs, as the system logs of the file process are not present in the current plugins
-and can only seen in the log dump (i.e the full console text from option 1])
+2] Get a structred log, which is more "Jenkinsfile language nodes" oriented, i.e you can see the console text of an action. But stage in a stage plannig? No logs, as the system logs and context of the parse process can only seen in the log dump (i.e the full console text from option 1]) from my experience. [Here is examples how jenkins log structure works i.e. action nodes](https://i.imgur.com/5A1W998.jpg)
 
-And this time, I had reached a wall. Why? Because in ever other CICD both the system logs and logs of steps are seperated out of the box. Here I will either give this feature up or will have to write a low level plugin to handle it. But why
-not just take the console text that IS seperated? Again, because to me, it's to much to give up. As inner parsing of a CI file can cause problem too. And if I don't see any way to debug it, that it is just a ticking bomb until I will it this bug
+And this time, I had reached a wall. Why? Because in every other CICD both the system logs and logs of steps are collected at the stage level out of the box. Here I will either give this feature up or will have to write a low level plugin to handle it. But why
+not just take the console text that IS seperated? Again, because to me, it's too much to give up. As inner parsing of a CI file can cause problem too. And if I don't see any way to debug it, that it is just a ticking bomb until I will it this bug
 in the future. Which I really don't want.
+
+Jenkins was just designed to be run on a few runners, not in parallel... I can't see it otherwise given it's log structure.
 
 ## Moving to gitlab runner
 
-Gitlab runner is also an officialy supported solution to run gitlab CI file. There are some caveats. You can only run 1 stage at a time (since the runner will do the same under a gitlab instance) but a simpe foreach in a bash script can fix this.
+Gitlab runner docker is also an officialy supported solution to run gitlab CI file. There are some caveats. You can only run 1 stage at a time (since the runner will do the same under a gitlab instance) but a simpe linear foreach in a bash script can fix this. which will give us a very similar feeling to the real solution.
+
+What is mostly missing:
+* There are no loops and dynamic stages, which is the real downgrade in my opnion. But seeing it as the only option I don't have much to do about it.
+* You can't build a docker in one step and use it in another unless you push it to a registry. (For local running, I think tagging it will be enough)
+
+On the plus side, whenever I go, It will easy to split the stages in such a way the platform except.
+
+There is also no problem with logs (so far) and plugins are just dockers (so we can also use github action plugins).
+
+There is also no need to a huge custom bash script, just a loop on stages and mounting to the correct place, and we are good to go on any platform!
+
+## Conclusion
+
+Even tough I still wonder If "I can fix her" i.e. fix Jenkins to give me the logs,  I think that 1 month of work just to find you need to touch core features next is a no go and a solution, even though less sophisiticated in its structure will
+be enough for me. As I mainly saw my plugin system moving around dockers and not a native one like jenkins have (or Azure Devops which is propitery)
 
 
