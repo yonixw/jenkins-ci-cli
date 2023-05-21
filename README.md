@@ -65,6 +65,7 @@ Learning Jenkins was surely not straight-forwared but I guessed it all was worth
 And as I digged deeper I found a lot of unducumented stuff, But again, thought it was worth the "long way". Here are more examples of unique issues I came across:
 
 * You had to build a custom docker to have your plugins inside it (not just mount it to the docker)
+  * i.e. plugins are "instance" level, and not in a pipeline level (so same pipeline might produce diff result)
 * You had to mount your workspace in specifiec scheme to applease some plugins
 * The built in bash did not know how to just add "lint" to the entrypoint, and you had to redifine it
 * You had to know Java conventions of env vars to enable "verbose" mode for plugins. (Since Jenkins is written in Java)
