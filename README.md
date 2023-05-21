@@ -33,3 +33,23 @@ will have other price constrains. All of those might cause a trigger to move bet
 And after thinking about all of the above. I decided I must find some cross platform way to plan my CI pipeline that will not stop me in the future.
 
 ## The possibilities
+
+Since there are a lot of options for a CI solution out there ([see this](https://github.com/ligurio/awesome-ci)), I had to find a few iron-cloud creteria which will help me to focus on a few.
+And I have decided on these:
+
+* Ability to run tasks locally - crutial to being cross platform
+* Top (giant) player - Github, Gitlab, etc. Ignoring even a 4k stared repo. I just can't let myself find out in a few years my choise was abondant. 
+  * Sub requirment - Good documentation
+* Open source when possible
+* Docker based when possible
+
+With the above, I ended up with 2 options: Gitlab and Jenkins. Here is why:
+
+* Github and Azure Devops have no self hosted version for free, so they are out of the race.
+* Drone, GoCD (and many others such as TeamCity) has no way to run yaml locally with 1 line of shell/docker. You have to have a server up with a lot of stuff configures. Some options are also only available through the UI.
+
+Please note that Github does have some tools to run a workflow locally, but they are not official and bring me back to my requirement of "Top player". 
+Gitlab is not fully open-sourced but it is open sourced enough for me to get the fully featured CI runner as a docker.
+
+Between my two finalists, I dabbled in gitlab but then realy wanted to try Jenkins as a solution. As, one, it is realy open sourced. and, two, I saw it being used mutliple times in very repectables companies. 
+
