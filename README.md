@@ -33,32 +33,32 @@ And after thinking about all of the above. I decided I must find some cross plat
 Since there are a lot of options for a CI solution out there ([see this](https://github.com/ligurio/awesome-ci)), I had to find a few iron-cloud criteria which will help me to focus on a few. And I have decided on these:
 
 *	Ability to run tasks locally - critical to being cross platform
-*	Top (giant) player - Github, Gitlab, etc. Ignoring even a 4k stared repo. I just can't let myself find out in a few years my choice was abundant.
- *	Sub requirement - Good documentation
+*	Top (giant) player - Github, Gitlab, etc. Ignoring even a 4k stared repo. I just can't let myself find out in a few years my choice was abandoned.
+    *	Sub requirement - Good documentation
 *	Open source when possible
 *	Docker based when possible
 
 With the above, I ended up with 2 options: Gitlab and Jenkins. Here is why:
 
 *	Github and Azure Devops have no self hosted version for free, so they are out of the race.
-*	Drone, GoCD (and many others such as TeamCity) has no way to run Yaml locally with 1 line of shell/docker. You have to have a server up with a lot of stuff configures. Some options are also only available through the UI.
+*	Drone, GoCD (and many others such as TeamCity) has no way to run Yaml locally with 1 line of shell/docker. You have to have a server up with a lot of stuff configured. Some options are also only available through the UI.
 
 Please note that Github does have some tools to run a workflow locally, but they are not official and bring me back to my requirement of "Top player". Gitlab is not fully open-sourced but it is open sourced enough for me to get the fully featured CI runner as a docker.
 
-Between my two finalists, I dabbled in gitlab but then really wanted to try Jenkins as a solution. As, one, it is really open sourced. and, two, I saw it being used multiple times in very respectables companies. Which gave me an apatite to make it work. And for the final reason, I understand that a gitlab CI file cannot add steps dynamically (like per item in an input list) which is a downgrade compared to Azure Devops and Jenkins.
+Between my two finalists, I dabbled in gitlab but then really wanted to try Jenkins as a solution. As, one, it is really open sourced. and, two, I saw it being used multiple times in very respected companies. Which gave me an apatite to make it work. And for the final reason, I understand that a gitlab CI file cannot add steps dynamically (like per item in an input list) which is a downgrade compared to Azure Devops and Jenkins.
 
 
 ## Trying out Jenkins
 
 Testing period was May 5, 2023 until May 22, 2023 ([under this project](https://github.com/yonixw/LivestreamDockerRecorder)). Unfortunately, I abandoned it. And here I will explain why.
 
-It started very good. There is an [offical docker image and a project](https://github.com/jenkinsci/jenkinsfile-runner) allowing you to run a "Jenkinsfile". And it supports they entire "Declarative Pipeline" so you can pass variables between stages just like in a real jenkins server etc.
+It started very good. There is an [offical docker image and a project](https://github.com/jenkinsci/jenkinsfile-runner) allowing you to run a "Jenkinsfile". And it supports the entire "Declarative Pipeline" so you can pass variables between stages just like in a real jenkins server etc.
 
 Learning Jenkins was surely not straight-forwarded but I guessed it all was worth it once I migrated to it. I even made a custom bash script to store my learning phase as a common function inside it (pull, run, lint etc.). And as I dig deeper, I found a lot of undocumented stuff, but again, thought it was worth the "long way". Here are more examples of unique issues I came across:
 
 
 *	You had to build a custom docker to have your plugins inside it (not just mount it to the docker)
-  *	i.e., plugins are "instance" level, and not in a pipeline level (so same pipeline might produce diff result)
+    * i.e., plugins are "instance" level, and not in a pipeline level (so same pipeline might produce diff result)
 *	You had to mount your workspace in specific scheme to appease some plugins
 *	The built in bash did not know how to just add "lint" to the entry point, and you had to redefine it
 *	You had to know Java conventions of env vars to enable "verbose" mode for plugins. (Since Jenkins is written in Java)
@@ -79,19 +79,20 @@ You can see those problems of log inconsistency here: https://i.imgur.com/bsUmt8
 
 And this time, I had reached a wall. Why? Because in every other CICD both the system logs and logs of steps are collected at the stage level out of the box. Here I will either give this feature up or will have to write a low-level plugin to handle it. (if even possible, see the inconsistencies in existing plugins in my image example above).
 
-But why not just take the console text that IS separated? Again, because to me, it's too much to give up. As inner parsing of a CI file can cause problem too. And if I don't see any way to debug it, that it is just a ticking bomb until I will find this bug in the future. Which I really don't want.
+But why not just take the console text that IS separated? Again, because to me, it's too much to give up. As inner parsing of a CI file can cause problem too. And if I don't see any way to debug it, that it is just a ticking bomb until I will find this bug in the future. Which I really don't want. Also, I very much support debug by logging as I don't always have the option to attach a debugger (almost never...)
 
 Why so many big companies use it then? Great question! Maybe because the worker pool is already there. And maybe their build flow is more straight-forwarded. But if I find problems and inconsistencies even in my evaluation phase... then it is just too much for me and I will search for alternatives.
 
 ## Moving to gitlab runner
 
 Gitlab runner docker is also an officially supported solution to run gitlab CI file. There are some caveats. You can only run 1 stage at a time (since the runner will do the same under a gitlab instance) but a simple linear foreach in a bash script can fix this. which will give us a very similar feeling to the real solution.
+
 What is mostly missing:
 
 *	There are no loops and dynamic stages, which is the real downgrade in my opinion. But seeing it as the only option I don't have much to do about it.
 *	You can't build a docker in one step and use it in another unless you push it to a registry. (For local running, I think tagging it will be enough)
 
-On the plus side, whenever I go, It will easy to split the stages in such a way the platform except.
+On the plus side, whenever I go, It will easy to split the stages in such a way the platform expect.
 
 There is also no problem with logs (so far) and plugins are just dockers (so we can also use github action plugins).
 
