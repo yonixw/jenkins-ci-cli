@@ -104,11 +104,14 @@ Even tough I still wonder If "I can fix her" i.e. fix Jenkins to give me the log
 
 ## Don't read this
 
-[Well...](https://www.youtube.com/watch?v=CdqMZ_s7Y6k)
+[↗ Well...](https://www.youtube.com/watch?v=CdqMZ_s7Y6k)
 
 ![image](https://github.com/yonixw/jenkins-ci-cli/assets/5826209/fd6ae2db-950e-4c32-a99b-8e00964b943f)
 
-[Unless...](https://youtu.be/W0gs_TuqoIU?t=32)
+[↗ Unless...](https://youtu.be/W0gs_TuqoIU?t=32)
 
-https://gitlab.com/gitlab-org/gitlab/-/issues/385235/?_gl=1%2a1qcmbhr%2a_ga%2aMjAzNDE1NTk4NS4xNjY0NzA4ODcy%2a_ga_ENFH3X7M5Y%2aMTY4NDg3MzE4My4yMy4xLjE2ODQ4NzQxNTkuMC4wLjA.#note_1342548743
+[This issue](https://gitlab.com/gitlab-org/gitlab/-/issues/385235/?_gl=1%2a1qcmbhr%2a_ga%2aMjAzNDE1NTk4NS4xNjY0NzA4ODcy%2a_ga_ENFH3X7M5Y%2aMTY4NDg3MzE4My4yMy4xLjE2ODQ4NzQxNTkuMC4wLjA.#note_1342548743)
+
+![image](https://github.com/yonixw/jenkins-ci-cli/assets/5826209/d97d3b54-590b-452c-bda7-a511495f932a)
+
 
